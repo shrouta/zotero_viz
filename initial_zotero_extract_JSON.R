@@ -1,6 +1,7 @@
-## This script queries a user's Zotero library and pulls the recently added items, along with their collections.
+## This script queries a user's Zotero library and pulls the recently added items, along with their collections.  Since the Zotero API has a limit of 25 items, use the zotero_extract_JSON_weekly script to update your JSON file
+## Make sure to update Zotero user and API key
 
-# If this is the first time you are running this script this year, use start_date in place of last_updated in line 37
+# Sets the date to start pulling.  Default is January 1, 2018
 start_date <- as.Date("2018-01-01", tz="GMT")
 
 # Loads Libraries
@@ -16,13 +17,13 @@ json_metadata <- c("collection", "name", "size")
 collections_metadata <- c("key", "data.name")
 
 # Calls zotero collections, coerces them into a data frame and converts the collections key to a character string
-collections <- fromJSON('https://api.zotero.org/users/204149/collections?key=y1TEiauuTLBML7DhGS774EPZ', flatten=TRUE)
+collections <- fromJSON('https://api.zotero.org/users/XXXXXX/collections?key=XXXXXXXXX', flatten=TRUE)
 collections <- as.data.frame(collections)
 collections <- collections[collections_metadata]
 collections$key <- as.character(collections$key)
 
 # Calls most recent Zotero items, coerces them into a data frame, subsets useful variables and renames them
-recent_zotero <- fromJSON('https://api.zotero.org/users/204149/items?format=json&itemType=journalArticle&key=y1TEiauuTLBML7DhGS774EPZ', flatten=TRUE)
+recent_zotero <- fromJSON('https://api.zotero.org/users/XXXXXX/items?format=json&itemType=journalArticle&key=XXXXXXXXXX', flatten=TRUE)
 recent_zotero_data <- as.data.frame(recent_zotero)
 recent_zotero_data <- recent_zotero_data[zotero_metadata]
 recent_zotero_data <- rename(recent_zotero_data, c("meta.creatorSummary"="author", "data.title"="title", "data.publicationTitle"="publication", "data.volume"="volume", "data.issue"="issue", "data.pages"="pages", "data.date"="date", "data.collections"="collections", "data.dateAdded"="date_added"))
@@ -49,8 +50,6 @@ recent_zotero_data <- recent_zotero_data[json_metadata]
 # Writes new additions to a JSON file
 JSON_export <- d3_nest(recent_zotero_data, value_cols="size", root="365 in 2018")
 JSON_export <- prettify(JSON_export, indent=4)
-last_updated <- Sys.Date()
-file_name <- paste("zotero_json_export_",last_updated,".json",sep="")
-con <- file(file_name)
+con <- file("papers_2018.json")
 writeLines(JSON_export, con)
 close(con)
