@@ -1,4 +1,5 @@
 ## This script queries a user's Zotero library and pulls the recently added items, along with their collections.
+## Before using, make sure to replace XXX and YYY with zotero user id and API key
 
 # If this is the first time you are running this script this year, use set last_updated to the first of the year and all_zotero_items to an empty data frame:
 last_updated <- as.Date("2018-01-01", tz="GMT")
@@ -17,7 +18,7 @@ json_metadata <- c("collection_name", "name", "size")
 collections_metadata <- c("key", "data.name")
 
 # Calls zotero collections, coerces them into a data frame and converts the collections key to a character string
-collections <- fromJSON('https://api.zotero.org/users/204149/collections?key=y1TEiauuTLBML7DhGS774EPZ', flatten=TRUE)
+collections <- fromJSON('https://api.zotero.org/users/XXX/collections?key=YYY', flatten=TRUE)
 collections <- as.data.frame(collections)
 collections <- collections[collections_metadata]
 collections$key <- as.character(collections$key)
@@ -25,7 +26,7 @@ collections <- rename(collections, c("data.name"="collection_name"))
 collections$ID <- collections$collection_name
 
 # Calls most recent Zotero items, coerces them into a data frame, subsets useful variables and renames them
-recent_zotero <- fromJSON('https://api.zotero.org/users/204149/items?format=json&itemType=journalArticle&key=y1TEiauuTLBML7DhGS774EPZ', flatten=TRUE)
+recent_zotero <- fromJSON('https://api.zotero.org/users/XXX/items?format=json&itemType=journalArticle&key=YYY', flatten=TRUE)
 recent_zotero_data <- as.data.frame(recent_zotero)
 recent_zotero_data <- recent_zotero_data[zotero_metadata]
 recent_zotero_data <- rename(recent_zotero_data, c("meta.creatorSummary"="author", "data.title"="title", "data.publicationTitle"="publication", "data.volume"="volume", "data.issue"="issue", "data.pages"="pages", "data.date"="date", "data.collections"="collections", "data.dateAdded"="date_added"))
