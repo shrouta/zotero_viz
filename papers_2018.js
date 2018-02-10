@@ -37,7 +37,10 @@ d3.json("papers_2018.json", function(error, root) {
       .style("fill", function(d) { return color((d.children ? d : d.parent).name); })
       .on("click", click)
     .append("title")
-      .text(function(d) { return d.name + ": " + formatNumber(d.value); });
+      .text(function(d) {
+      	if (d.value > 1) { return "I have read " + formatNumber(d.value) + " articles for " + d.name}
+      	else { return d.name};
+      });
 });
 
 
